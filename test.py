@@ -1,14 +1,20 @@
 import os
 import sys
+
+from PyQt5.uic.properties import QtWidgets, QtCore
+
 import first
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import *
 from socket import *
 import pymssql
 import time
 import xlwt
-
+from PyQt5.QtCore import QObject, pyqtSignal, QThread, QDateTime
 
 # 设置表格样式
+import second
+
+
 def set_style(name, height, bold=False):
     style = xlwt.XFStyle()
     font = xlwt.Font()
@@ -119,36 +125,63 @@ def findByDate(button, textfile):
         connect.close()
 
 
-def workByID(button, texfile):
-    if texfile.toPlainText() == '':
-        a = QMessageBox.warning(button, "警告", "序列号不能为空！", QMessageBox.Yes)
-    else:
-        try:
-            HOST = '127.0.0.1'  # 服务端ip
-            PORT = 21566  # 服务端端口号
-            BUFSIZ = 1024
-            ADDR = (HOST, PORT)
-            tcpCliSock = socket(AF_INET, SOCK_STREAM)  # 创建socket对象
-            tcpCliSock.connect(ADDR)  # 连接服务器
-            data = texfile.toPlainText()
-            tcpCliSock.send(data.encode('utf-8'))  # 发送消息
-            data = tcpCliSock.recv(BUFSIZ)  # 读取消息
-            print(data.decode('utf-8'))
-            tcpCliSock.close()  # 关闭客户端
-        except Exception:
-            a = QMessageBox.warning(button, "警告", "控制器未打开！", QMessageBox.Yes)
+class Window(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setWindowTitle('扫码工作')
+        self.resize(500, 250)
+        self.input = QLineEdit(self)
+        self.input.setGeometry(0, 0, 0, 0)
+        self.label = QLabel(self)
+        self.label.setGeometry(160, 130, 200, 50)
+        self.label.setText("注意打开控制器")
+        self.input.selectAll()
+        self.input.setFocus()
+        self.input.returnPressed.connect(self.updateUi)
+
+    def updateUi(self):
+        print(self.input.text() + '\n')
+        if self.input.text() == '':
+            a = QMessageBox.warning(None, "警告", "序列号不能为空！", QMessageBox.Yes)
+        else:
+            try:
+                # HOST = '192.168.4.4'  # 服务端ip
+                # PORT = 41000  # 服务端端口号
+                HOST = '127.0.0.1'
+                PORT = 21566
+                BUFSIZ = 10241
+                ADDR = (HOST, PORT)
+                tcpCliSock = socket(AF_INET, SOCK_STREAM)  # 创建socket对象
+                tcpCliSock.connect(ADDR)  # 连接服务器
+                data = self.input.text() + '\n'
+                tcpCliSock.send(data.encode('utf-8'))  # 发送消息
+                data = tcpCliSock.recv(BUFSIZ)  # 读取消息
+                print(data.decode('utf-8'))
+                tcpCliSock.close()  # 关闭客户端
+            except Exception:
+                a = QMessageBox.warning(None, "警告", "控制器未打开！", QMessageBox.Yes)
+        self.input.setText("")
+
+
+class parentWindow(QMainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.main_ui = first.Ui_Main()
+        self.main_ui.setupUi(self)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mainWindow = QMainWindow()
-    ui = first.Ui_Dialog()
-    ui.setupUi(mainWindow)
-    mainWindow.show()
+    first = parentWindow()
+    win = Window()
+
     # 根据序列号查询
-    ui.pushButton.clicked.connect(lambda: findByID(ui.pushButton, ui.lineEdit))
+    first.main_ui.pushButton.clicked.connect(lambda: findByID(first.main_ui.pushButton, first.main_ui.lineEdit))
     # 根据日期查询
-    ui.pushButton_2.clicked.connect(lambda: findByDate(ui.pushButton_2, ui.lineEdit_2))
+    first.main_ui.pushButton_2.clicked.connect(lambda: findByDate(first.main_ui.pushButton_2, first.main_ui.lineEdit_2))
     # 发送序列号工作
-    ui.pushButton_3.clicked.connect(lambda: workByID(ui.pushButton_3, ui.textEdit))
+    first.main_ui.pushButton_3.clicked.connect(win.show)
+
+    # 显示
+    first.show()
     sys.exit(app.exec())
