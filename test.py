@@ -26,56 +26,110 @@ def set_style(name, height, bold=False):
     return style
 
 
-def findByID(button, textfile):
+def findByIDONE(button, textfile):
     data = textfile.text()
     if data == "":
-        a = QMessageBox.warning(button, "警告", "序列号不能为空！", QMessageBox.Yes)
+        a = QMessageBox.warning(button, "警告", "型号不能为空！", QMessageBox.Yes)
     else:
         data = textfile.text()
         connect = pymssql.connect('(local)', 'sa', '123456', 'lCS_Common')  # 服务器名,账户,密码,数据库名
         if connect:
             print("连接成功!")
         cursor = connect.cursor()  # 创建一个游标对象,python里的sql语句都要通过cursor来执行
-        sql1 = "select name from syscolumns where id = object_id('tbl_EOR_Data')"
-        cursor.execute(sql1)  # 执行sql语句
-        row = cursor.fetchone()  # 读取查询结果
-        list = []
-        while row:  # 循环读取所有结果
-            list.append(row[0])
-            row = cursor.fetchone()
-        new_list = []
-        for i in range(len(list)):
-            a = list.pop()
-            new_list.append(a)
 
-        sql = "SELECT * FROM tbl_EOR_Data WHERE id= %s" % (data)
-        cursor.execute(sql)  # 执行sql语句
+        sql = "SELECT * FROM tbl_EOR_Data WHERE fld_Barcode Like %" + "%s" % (data)
+        sql = sql + '%'
+        sql1 = sql[0:sql.rfind(' ')]
+        sql2 = sql[sql.rfind(' ') + 1:]
+        finalsql = sql1 + "'" + sql2 + "'"
+        print(finalsql)
+        cursor.execute(finalsql)  # 执行sql语句
         row = cursor.fetchone()  # 读取查询结果
         if row == None:
             a = QMessageBox.warning(button, "警告", "不存在该记录！", QMessageBox.Yes)
         else:
             count = 1
             f = xlwt.Workbook()
-            sheet1 = f.add_sheet('序列号找到的工件', cell_overwrite_ok=True)
+            sheet1 = f.add_sheet('型号号找到的工件', cell_overwrite_ok=True)
             while row:  # 循环读取所有结果
                 # 写第一行
-                for i in range(0, len(new_list)):
-                    sheet1.write(0, i, new_list[i], set_style('Times New Roman', 220, True))  # 行 列
+                sheet1.write(0, 0, "台次号", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 1, "时间", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 2, "实测扭矩", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 3, "规定扭矩", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 4, "总群组计数", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 5, "当前群组计数", set_style('Times New Roman', 220, True))
                 # 写一行数据
-                for a in range(0, len(new_list)):
-                    sheet1.col(a).width = 256 * 20
+                for a in range(0, 6):
+                    if a == 0:
+                        sheet1.col(a).width = 256 * 40
+                    else:
+                        sheet1.col(a).width = 256 * 20
                     sheet1.write(count, a, str(row[a]))
                 count = count + 1
                 row = cursor.fetchone()
-        ticks = time.time()
-        f.save(os.path.join(os.path.expanduser('~'), "Desktop") + "\\" + str(ticks) + "序列号.xls")
+            ticks = time.time()
+            f.save(os.path.join(os.path.expanduser('~'), "Desktop") + "\\" + str(ticks) + "型号号.xls")
+            a = QMessageBox.warning(button, "", "查询成功！", QMessageBox.Yes)
         cursor.close()
         connect.close()
 
 
+# 台次号
+def findByID(button, textfile):
+    data = textfile.text()
+    if data == "":
+        a = QMessageBox.warning(button, "警告", "台次号不能为空！", QMessageBox.Yes)
+    else:
+        data = textfile.text()
+        connect = pymssql.connect('(local)', 'sa', '123456', 'lCS_Common')  # 服务器名,账户,密码,数据库名
+        if connect:
+            print("连接成功!")
+        cursor = connect.cursor()  # 创建一个游标对象,python里的sql语句都要通过cursor来执行
+
+        sql = "SELECT * FROM tbl_EOR_Data WHERE fld_Barcode Like %s" % (data)
+        sql = sql + '%'
+        sql1 = sql[0:sql.rfind(' ')]
+        sql2 = sql[sql.rfind(' ') + 1:]
+        finalsql = sql1 + "'" + sql2 + "'"
+        print(finalsql)
+        cursor.execute(finalsql)  # 执行sql语句
+        row = cursor.fetchone()  # 读取查询结果
+        if row == None:
+            a = QMessageBox.warning(button, "警告", "不存在该记录！", QMessageBox.Yes)
+        else:
+            count = 1
+            f = xlwt.Workbook()
+            sheet1 = f.add_sheet('台次号找到的工件', cell_overwrite_ok=True)
+            while row:  # 循环读取所有结果
+                # 写第一行
+                sheet1.write(0, 0, "台次号", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 1, "时间", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 2, "实测扭矩", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 3, "规定扭矩", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 4, "总群组计数", set_style('Times New Roman', 220, True))
+                sheet1.write(0, 5, "当前群组计数", set_style('Times New Roman', 220, True))
+                # 写一行数据
+                for a in range(0, 6):
+                    if a == 0:
+                        sheet1.col(a).width = 256 * 40
+                    else:
+                        sheet1.col(a).width = 256 * 20
+                    sheet1.write(count, a, str(row[a]))
+                count = count + 1
+                row = cursor.fetchone()
+            ticks = time.time()
+            f.save(os.path.join(os.path.expanduser('~'), "Desktop") + "\\" + str(ticks) + "台次号.xls")
+            a = QMessageBox.warning(button, "", "查询成功！", QMessageBox.Yes)
+        cursor.close()
+        connect.close()
+
+
+# 日期
 def findByDate(button, textfile):
     global f1
     data = textfile.text()
+    print(data)
     if data == "":
         a = QMessageBox.warning(button, "警告", "日期不能为空！", QMessageBox.Yes)
     else:
@@ -83,19 +137,8 @@ def findByDate(button, textfile):
         if connect:
             print("连接成功!")
         cursor = connect.cursor()  # 创建一个游标对象,python里的sql语句都要通过cursor来执行
-        sql1 = "select name from syscolumns where id = object_id('tbl_EOR_Data')"
-        cursor.execute(sql1)  # 执行sql语句
-        row = cursor.fetchone()  # 读取查询结果
-        list = []
-        while row:  # 循环读取所有结果
-            list.append(row[0])
-            row = cursor.fetchone()
-        new_list = []
-        for i in range(len(list)):
-            a = list.pop()
-            new_list.append(a)
 
-        sql = "SELECT * FROM tbl_EOR_Data WHERE Convert(varchar,date,120) LIKE %s" % (data)
+        sql = "SELECT * FROM tbl_EOR_Data WHERE Convert(varchar,fld_Date_Time_Of_Cycle,120) LIKE %s" % (data)
         sql = sql + '%'
         sql1 = sql[0:sql.rfind(' ')]
         sql2 = sql[sql.rfind(' ') + 1:]
@@ -110,24 +153,36 @@ def findByDate(button, textfile):
             sheet = f1.add_sheet('日期找到的工件', cell_overwrite_ok=True)
             while row:  # 循环读取所有结果
                 # 写第一行
-                for i in range(0, len(new_list)):
-                    sheet.write(0, i, new_list[i], set_style('Times New Roman', 220, True))  # 行 列
+                # for i in range(0, len(new_list)):
+                #     sheet.write(0, i, new_list[i], set_style('Times New Roman', 220, True))  # 行 列
+                sheet.write(0, 0, "台次号", set_style('Times New Roman', 220, True))
+                sheet.write(0, 1, "时间", set_style('Times New Roman', 220, True))
+                sheet.write(0, 2, "实测扭矩", set_style('Times New Roman', 220, True))
+                sheet.write(0, 3, "规定扭矩", set_style('Times New Roman', 220, True))
+                sheet.write(0, 4, "总群组计数", set_style('Times New Roman', 220, True))
+                sheet.write(0, 5, "当前群组计数", set_style('Times New Roman', 220, True))
                 # 写一行数据
-                for a in range(0, len(new_list)):
-                    sheet.col(a).width = 256 * 20
+                for a in range(0, 6):
+                    if a == 0:
+                        sheet.col(a).width = 256 * 40
+                    else:
+                        sheet.col(a).width = 256 * 20
                     sheet.write(co, a, str(row[a]))
                 co = co + 1
                 print()
                 row = cursor.fetchone()
-        ticks = time.time()
-        f1.save(os.path.join(os.path.expanduser('~'), "Desktop") + "\\" + str(ticks) + "日期.xls")
+            ticks = time.time()
+            f1.save(os.path.join(os.path.expanduser('~'), "Desktop") + "\\" + str(ticks) + "日期.xls")
+            a = QMessageBox.warning(button, "", "查询成功！", QMessageBox.Yes)
         cursor.close()
         connect.close()
 
 
 class Window(QDialog):
-    def __init__(self):
+    def __init__(self, taici, xinghao):
         QDialog.__init__(self)
+        self.taici1 = taici
+        self.xinghao1 = xinghao
         self.setWindowTitle('扫码工作')
         self.resize(500, 250)
         self.input = QLineEdit(self)
@@ -140,7 +195,8 @@ class Window(QDialog):
         self.input.returnPressed.connect(self.updateUi)
 
     def updateUi(self):
-        print(self.input.text() + '\n')
+        # print(self.input.text() + '\n')
+        print("------------------------------------------------")
         if self.input.text() == '':
             a = QMessageBox.warning(None, "警告", "序列号不能为空！", QMessageBox.Yes)
         else:
@@ -153,7 +209,9 @@ class Window(QDialog):
                 ADDR = (HOST, PORT)
                 tcpCliSock = socket(AF_INET, SOCK_STREAM)  # 创建socket对象
                 tcpCliSock.connect(ADDR)  # 连接服务器
-                data = self.input.text() + '\n'
+                data = self.taici1 + "QQQQQQ" + self.xinghao1 + "QQQQQQ" + self.input.text() + '\n'
+                # data=self.input.text() + '\n'
+                print(data)
                 tcpCliSock.send(data.encode('utf-8'))  # 发送消息
                 data = tcpCliSock.recv(BUFSIZ)  # 读取消息
                 print(data.decode('utf-8'))
@@ -170,17 +228,30 @@ class parentWindow(QMainWindow):
         self.main_ui.setupUi(self)
 
 
+def startwork(win, taici, xinghao):
+    if taici == '' or xinghao == '':
+        a = QMessageBox.warning(None, "警告", "台次号或者型号不能为空！", QMessageBox.Yes)
+    else:
+        win.taici1=taici
+        win.xinghao1=xinghao
+        win.show()
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     first = parentWindow()
-    win = Window()
+    win = Window('','')
 
-    # 根据序列号查询
+    # 根据台次号查询
     first.main_ui.pushButton.clicked.connect(lambda: findByID(first.main_ui.pushButton, first.main_ui.lineEdit))
     # 根据日期查询
     first.main_ui.pushButton_2.clicked.connect(lambda: findByDate(first.main_ui.pushButton_2, first.main_ui.lineEdit_2))
     # 发送序列号工作
-    first.main_ui.pushButton_3.clicked.connect(win.show)
+    first.main_ui.pushButton_3.clicked.connect(
+        lambda: startwork(win, first.main_ui.lineEdit_4.text(), first.main_ui.lineEdit_5.text()))
+    # 根据型号查询
+    first.main_ui.pushButton_4.clicked.connect(
+        lambda: findByIDONE(first.main_ui.pushButton_4, first.main_ui.lineEdit_3))
 
     # 显示
     first.show()
