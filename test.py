@@ -9,6 +9,7 @@ from socket import *
 import pymssql
 import time
 import xlwt
+import  PyQt5.sip
 from PyQt5.QtCore import QObject, pyqtSignal, QThread, QDateTime
 
 # 设置表格样式
