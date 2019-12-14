@@ -87,7 +87,7 @@
     </font>
    </property>
    <property name="text">
-    <string>台次号：</string>
+    <string>二维码：</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -159,7 +159,7 @@
     </font>
    </property>
    <property name="text">
-    <string>型号：</string>
+    <string>台次号：</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_4">
@@ -190,7 +190,7 @@
     </font>
    </property>
    <property name="text">
-    <string>台次号：</string>
+    <string>二维码：</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_4">
@@ -218,7 +218,7 @@
     </font>
    </property>
    <property name="text">
-    <string>型号：</string>
+    <string>台次号：</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_5">
@@ -246,7 +246,7 @@
     </font>
    </property>
    <property name="text">
-    <string>扫码之前请输入台次号和型号</string>
+    <string>工作之前请扫描二维码并输入台次号</string>
    </property>
   </widget>
  </widget>

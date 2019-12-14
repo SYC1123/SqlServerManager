@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'first.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.8.2
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_Main(object):
     def setupUi(self, Dialog):
@@ -95,11 +93,12 @@ class Ui_Main(object):
         self.pushButton.setText(_translate("Dialog", "查询"))
         self.pushButton_2.setText(_translate("Dialog", "查询"))
         self.pushButton_3.setText(_translate("Dialog", "扫码工作"))
-        self.label.setText(_translate("Dialog", "台次号："))
+        self.label.setText(_translate("Dialog", "二维码："))
         self.label_2.setText(_translate("Dialog", "日期："))
         self.label_4.setText(_translate("Dialog", "请按照年-月-日格式输入。例如2019-02-03"))
-        self.label_3.setText(_translate("Dialog", "型号："))
+        self.label_3.setText(_translate("Dialog", "台次号："))
         self.pushButton_4.setText(_translate("Dialog", "查询"))
-        self.label_5.setText(_translate("Dialog", "台次号："))
-        self.label_6.setText(_translate("Dialog", "型号："))
-        self.label_7.setText(_translate("Dialog", "扫码之前请输入台次号和型号"))
+        self.label_5.setText(_translate("Dialog", "二维码："))
+        self.label_6.setText(_translate("Dialog", "台次号："))
+        self.label_7.setText(_translate("Dialog", "工作之前请扫描二维码并输入台次号"))
+
